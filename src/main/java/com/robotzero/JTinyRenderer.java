@@ -15,11 +15,15 @@ public class JTinyRenderer {
 
   public static void main(String [] args) {
     String path = "result/image.bmp";
+    Render render = new Render();
     try {
       int width = 100;
       int height = 100;
       BufferedImage image = new BufferedImage(100, 100, TYPE_INT_RGB);
-      image.setRGB(30, 30, Color.RED.getRGB());
+      render.lineSecond(13, 20, 80, 40, image, Color.WHITE);
+      render.lineSecond(20, 13, 40, 80, image, Color.RED);
+      render.lineSecond(80, 40, 13, 20, image, Color.RED);
+      image = render.flipVertically(image);
       int [] pixels = image.getRGB(0, 0, width, height, null, 0, width);
 
       byte [] buffer = TGAWriter.write(pixels, width, height, TGAReader.ARGB);
