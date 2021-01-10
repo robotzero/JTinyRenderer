@@ -1,5 +1,8 @@
 package com.robotzero;
 
+import org.joml.Vector2f;
+import org.joml.Vector2i;
+
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -75,24 +78,38 @@ public class Render {
     image = op.filter(image, null);
     return image;
   }
-}
 
-//  bool steep = false;
-//    if (std::abs(x0-x1)<std::abs(y0-y1)) { // if the line is steep, we transpose the image
-//    std::swap(x0, y0);
-//    std::swap(x1, y1);
-//    steep = true;
-//    }
-//    if (x0>x1) { // make it left−to−right
-//    std::swap(x0, x1);
-//    std::swap(y0, y1);
-//    }
-//    for (int x=x0; x<=x1; x++) {
-//    float t = (x-x0)/(float)(x1-x0);
-//    int y = y0*(1.-t) + y1*t;
-//    if (steep) {
-//    image.set(y, x, color); // if transposed, de−transpose
-//    } else {
-//    image.set(x, y, color);
-//    }
-//    }
+  public void triangle(Vector2f t0, Vector2f t1, Vector2f t2, BufferedImage image, Color color) {
+
+    if (t0.y > t1.y) swap(t0, t1);
+    if (t0.y > t2.y) swap(t0, t2);
+    if (t1.y > t2.y) swap(t1, t2);
+//    lineThird(t0.x, t0.y, t1.x, t1.y, image, Color.GREEN);
+//    lineThird(t1.x, t1.y, t2.x, t2.y, image, Color.GREEN);
+//    lineThird(t2.x, t2.y, t0.x, t0.y, image, Color.RED);
+//    lineThird(t0.x, t0.y, t1.x, t1.y, image, color);
+//    lineThird(t1.x, t1.y, t2.x, t2.y, image, color);
+//    lineThird(t2.x, t2.y, t0.x, t0.y, image, color);
+
+    int total_height = (int) t2.y - (int) t0.y;
+    for (int y = (int)t0.y; y <= (int)t1.y; y++) {
+      int segment_height = (int) t1.y - (int) t0.y + 1;
+      float alpha = (float) (y - t0.y) / total_height;
+      float beta  = (float) (y - t0.y) / segment_height; // be careful with divisions by zero
+      Vector2f A = (new Vector2f(t2).sub(t0)).mul(alpha).add(t0);
+      Vector2f B = (new Vector2f(t1).sub(t0)).mul(beta).add(t0);
+      image.setRGB((int)A.x, y, Color.RED.getRGB());
+      image.setRGB((int)B.x, y, Color.GREEN.getRGB());
+    }
+  }
+
+  private void swap(Vector2f v1, Vector2f v2) {
+    Vector2f v1old = new Vector2f(v1.x, v1.y);
+    Vector2f v2old = new Vector2f(v2.x, v2.y);
+
+    v1.x = v2.x;
+    v1.y = v2.y;
+    v2.x = v1old.x;
+    v2.y = v1old.y;
+  }
+}
